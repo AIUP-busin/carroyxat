@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="OLX.uz dagi egasidan sotilayotgan Chevrolet va elektromobillar, ijara daromadi kalkulyatori. Har soatda yangilanadi.">
+<title>Egasidan Mashinalar</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+[hidden]{display:none!important}
+html{color-scheme:light dark}
+body{margin:0}
+img{max-width:100%}
+/* Layout: dark road-sign header band → sticky section nav → stats / buying guide / rental calculator / listings */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --sunk:#e9eeec; --fg:#141c19; --muted:#5b6a65; --line:#d7e0dc;
+  --accent:#0d7a5a; --accent-2:#0a5f46; --accent-soft:#dff1ea; --ink-on-accent:#ffffff;
+  --band:#13201b; --band-fg:#eef5f2; --band-muted:#9fb4ac; --sign:#f2c230;
+  --warn:#9a5a00; --warn-soft:#fbefd9; --bad:#b3261e; --good:#0d7a5a;
+  --display:"Unbounded","Manrope",system-ui,sans-serif; --body:"Manrope",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1412; --surface:#161e1b; --sunk:#1c2622; --fg:#e8efec; --muted:#9aaca5; --line:#283430;
+  --accent:#43c49a; --accent-2:#6fd8b4; --accent-soft:#143429; --ink-on-accent:#06120d;
+  --band:#0a100e; --band-fg:#eef5f2; --band-muted:#8ea39b; --sign:#f2c230;
+  --warn:#f0b35a; --warn-soft:#3a2a12; --bad:#ff8a80; --good:#43c49a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1412; --surface:#161e1b; --sunk:#1c2622; --fg:#e8efec; --muted:#9aaca5; --line:#283430;
+  --accent:#43c49a; --accent-2:#6fd8b4; --accent-soft:#143429; --ink-on-accent:#06120d;
+  --band:#0a100e; --band-fg:#eef5f2; --band-muted:#8ea39b; --sign:#f2c230;
+  --warn:#f0b35a; --warn-soft:#3a2a12; --bad:#ff8a80; --good:#43c49a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.55;font-size:15px}
+.in{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+/* header band */
+.band{background:var(--band);color:var(--band-fg)}
+.band .in{padding-block:36px 30px;display:grid;gap:22px}
+.plate{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--band-muted)}
+.plate b{background:var(--sign);color:#141c19;padding:3px 8px;border-radius:4px;letter-spacing:.08em}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,5vw,52px);line-height:1.05;margin:0;letter-spacing:-.02em;text-wrap:balance;max-width:18ch}
+h1 em{font-style:normal;color:var(--sign)}
+.lead{color:var(--band-muted);max-width:68ch;margin:0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:#2a3833;border:1px solid #2a3833;border-radius:10px;overflow:hidden}
+.tile{background:var(--band);padding:14px 16px}
+.tile b{display:block;font-family:var(--mono);font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--band-fg)}
+.tile span{font-size:12.5px;color:var(--band-muted)}
+/* nav */
+nav.sec{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+nav.sec .in{display:flex;gap:6px;overflow-x:auto;padding-block:10px}
+nav.sec a{flex:none;text-decoration:none;color:var(--fg);font-weight:700;font-size:13.5px;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+nav.sec a:hover{border-color:var(--accent);color:var(--accent)}
+main .in{padding-block:34px 56px;display:grid;gap:56px}
+section{display:grid;gap:18px;scroll-margin-top:70px;min-width:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h2{font-family:var(--display);font-weight:700;font-size:clamp(22px,3vw,30px);margin:2px 0 0;letter-spacing:-.01em;text-wrap:balance}
+h3{font-size:16px;margin:0;font-weight:800}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+/* segmented */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface);gap:2px}
+.seg button{font:inherit;font-size:13px;font-weight:700;border:0;background:transparent;color:var(--muted);padding:6px 12px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--ink-on-accent)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.head-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px}
+/* charts */
+.chart{width:100%;display:block}
+.chart text{font-family:var(--body);font-size:12px;fill:var(--muted)}
+.chart .lbl{fill:var(--fg);font-weight:600}
+.chart .val{fill:var(--fg);font-family:var(--mono);font-size:11.5px}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .bar{fill:var(--accent)}
+.chart .bar.dim{fill:var(--accent);opacity:.45}
+.chart g.row:hover .bar{fill:var(--accent-2);opacity:1}
+.tip{position:fixed;pointer-events:none;background:var(--fg);color:var(--bg);font-size:12.5px;padding:7px 10px;border-radius:6px;max-width:260px;z-index:20;line-height:1.4}
+/* checklist */
+.check{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.check li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}
+.check li::before{content:"";width:16px;height:16px;margin-top:3px;border:2px solid var(--accent);border-radius:4px}
+.check li b{font-weight:700}
+.card-k{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.badge{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;padding:3px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.badge.warn{background:var(--warn-soft);color:var(--warn)}
+.redflags{background:var(--warn-soft);border:1px solid transparent;border-radius:12px;padding:18px 20px}
+.redflags h3{color:var(--warn)}
+.redflags ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px}
+/* rental */
+.formats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px}
+@media (max-width:820px){.calc{grid-template-columns:1fr}}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:460px){.fields{grid-template-columns:1fr}}
+.field{display:grid;gap:4px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label{font-size:12.5px;font-weight:700;color:var(--muted)}
+.field input,.field select{font:inherit;font-family:var(--mono);font-size:14px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%;min-width:0}
+.field select{font-family:var(--body);font-weight:700}
+.hint{font-size:11.5px;color:var(--muted)}
+.out{display:grid;gap:12px;align-content:start}
+.big{background:var(--band);color:var(--band-fg);border-radius:12px;padding:18px 20px;display:grid;gap:4px}
+.big span{font-size:12.5px;color:var(--band-muted)}
+.big b{font-family:var(--mono);font-size:clamp(26px,4vw,36px);font-weight:600;font-variant-numeric:tabular-nums}
+.big small{font-family:var(--mono);color:var(--sign);font-size:14px}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.kv div{background:var(--sunk);border-radius:10px;padding:12px 14px;min-width:0}
+.kv span{display:block;font-size:12px;color:var(--muted)}
+.kv b{font-family:var(--mono);font-size:17px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.neg{color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+.wide{min-width:980px}
+th,td{padding:9px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:var(--surface);white-space:nowrap}
+th[data-k]{cursor:pointer}
+th[data-k]:hover{color:var(--accent)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.model{font-weight:700}
+#rows tr:hover td{background:var(--accent-soft)}
+a{color:var(--accent);font-weight:700}
+.chip.new{background:var(--accent-soft);color:var(--accent)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--band-muted);display:inline-block}
+.dot.ok{background:#3fd69c;box-shadow:0 0 0 3px rgba(63,214,156,.25)}
+.dot.err{background:#ff8a80}
+.chip{display:inline-block;font-size:11px;padding:2px 7px;border-radius:999px;background:var(--warn-soft);color:var(--warn);font-weight:700;margin-top:4px}
+.def{color:var(--muted);max-width:30ch}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+input[type=search]{font:inherit;flex:1 1 220px;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg)}
+label.chk{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.note{font-size:12.5px;color:var(--muted);max-width:90ch}
+footer{border-top:1px solid var(--line)}
+footer .in{padding-block:24px 40px;display:grid;gap:8px;font-size:12.5px;color:var(--muted)}
+footer ul{margin:0;padding-left:18px;display:grid;gap:3px}
+@media (prefers-reduced-motion:no-preference){.chart .bar{transition:width .35s ease}}
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="in">
+    <div class="plate"><b>01 UZ</b> <span id="live-dot" class="dot"></span><span id="live">OLX.uz · ma'lumot yuklanmoqda…</span></div>
+    <h1>Egasidan mashina: <em>sotib olish</em> va ijaraga berish</h1>
+    <p class="lead">Chevrolet va elektromobil e'lonlaridan faqat egasi sotayotganlari ajratildi. Pastda narx statistikasi, xarid oldidan tekshiruv ro'yxati va ijaradan daromad kalkulyatori bor.</p>
+    <div class="tiles">
+      <div class="tile"><b id="k-own">81</b><span id="k-own-l">egasidan e'lon (35 Chevrolet, 46 elektro)</span></div>
+      <div class="tile"><b id="k-rm">73</b><span>perekup, salon va kredit e'lonlari chiqarib tashlandi</span></div>
+      <div class="tile"><b>167</b><span>Toshkentdagi ijara e'loni tahlil qilindi</span></div>
+      <div class="tile"><b>11 913</b><span>so'm = $1 (Markaziy bank, 14.10)</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="sec" aria-label="Bo'limlar"><div class="in">
+  <a href="#stat">Statistika</a><a href="#xarid">Sotib olishda</a><a href="#ijara">Ijara narxlari</a><a href="#kalk">Daromad kalkulyatori</a><a href="#elon">E'lonlar</a>
+</div></nav>
+
+<main><div class="in">
+
+<!-- STATISTIKA -->
+<section id="stat">
+  <div class="head-row">
+    <div><div class="eyebrow">Statistika</div><h2>Egasidan narxlar, model bo'yicha</h2></div>
+    <div class="seg" role="group" aria-label="Turi"><button id="s-chev" aria-pressed="true">Chevrolet</button><button id="s-ev" aria-pressed="false">Elektromobil</button></div>
+  </div>
+  <div class="grid2">
+    <div class="panel"><h3>O'rtacha (mediana) narx, $</h3><p class="small muted">Har bir modelning o'rtadagi narxi. So'mdagi narxlar kurs bo'yicha dollarga aylantirildi. Qavsda e'lonlar soni.</p><svg class="chart" id="ch-price" role="img" aria-label="Model bo'yicha mediana narx"></svg></div>
+    <div class="panel"><h3>O'rtacha yili va probegi</h3><p class="small muted">Real bo'lmagan probeglar (eski mashinada 1 000 km dan kam) hisobga olinmadi.</p>
+      <div class="tbl" style="margin-top:10px;border:0"><table><thead><tr><th>Model</th><th>E'lon</th><th>Narx oralig'i</th><th>O'rt. yil</th><th>O'rt. probeg</th></tr></thead><tbody id="stat-tb"></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- XARID -->
+<section id="xarid">
+  <div><div class="eyebrow">Sotib olishda</div><h2>Pul berishdan oldin nimani tekshirish kerak</h2></div>
+  <div class="grid3">
+    <div class="panel"><div class="card-k"><span class="badge">1</span><h3>Hujjat va sotuvchi</h3></div>
+      <ul class="check">
+        <li><span><b>Texpasport</b> sotuvchining o'z nomida bo'lsin. Ishonchnoma bilan sotsa, ehtiyot bo'ling.</span></li>
+        <li><span><b>VIN va dvigatel raqami</b> texpasportdagi bilan mashinadagisi bir xil ekanini solishtiring.</span></li>
+        <li><span><b>Taqiq, garov va jarimalar</b>ni my.gov.uz orqali tekshiring. Kreditdagi mashina qayta rasmiylashtirilmaydi.</span></li>
+        <li><span><b>Egalar soni</b>: 1–2 egasi yaxshi. Ko'p qo'l almashgan mashina taksida ishlagan bo'lishi mumkin.</span></li>
+        <li><span><b>Pulni</b> faqat notariusda yoki rasmiylashtirish paytida bering. Oldindan zaklad bermang.</span></li>
+      </ul></div>
+    <div class="panel"><div class="card-k"><span class="badge">2</span><h3>Kuzov va texnik holat</h3></div>
+      <ul class="check">
+        <li><span><b>Kraska o'lchagich</b> (tolshinomer) bilan har bir detalni o'lchating. Zavod kraskasi taxminan 90–160 mkm, 250+ bo'lsa shpaklyovka bor.</span></li>
+        <li><span><b>Lonjeron, stoyka va pol</b>ni ko'ring. Payvand izi bo'lsa, mashina qattiq urilgan.</span></li>
+        <li><span><b>Sovuq dvigatel</b>ni yurgizib ko'ring: tutun, taqillash, moy oqishi bo'lmasin.</span></li>
+        <li><span><b>Avtomat karobka</b>: o'tish paytida turtki yoki sirpanish bo'lmasin. Gentra va Malibu'da bu ko'p uchraydigan muammo.</span></li>
+        <li><span><b>Diagnostika</b>: kompyuter diagnostikasi va ko'targichda ostini ko'rish. Bu taxminan 150–300 ming so'm turadi, lekin millionlarni tejaydi.</span></li>
+      </ul></div>
+    <div class="panel"><div class="card-k"><span class="badge">3</span><h3>Elektromobil uchun alohida</h3></div>
+      <ul class="check">
+        <li><span><b>Batareya holati (SOH)</b> diagnostika qilinsin. 90% dan yuqori bo'lsa yaxshi, 80% dan past bo'lsa narxni ancha tushiring.</span></li>
+        <li><span><b>Real zapas xod</b>: to'liq zaryad bilan necha km yurishini sinab ko'ring. E'londagi raqam zavod ko'rsatkichi.</span></li>
+        <li><span><b>Batareya almashtirish narxi</b>ni oldindan bilib qo'ying. Ko'pincha mashina narxining 30–50% ini tashkil qiladi.</span></li>
+        <li><span><b>Xitoy versiyasi</b>mi, rasmiy dilermi? Rasmiy mashinada kafolat va servis bo'ladi. Proshivka va til ham muhim.</span></li>
+        <li><span><b>Zaryad porti va kabel</b> ishlashini tekshiring. Uyda quvvatlash mumkinligini ham hisobga oling.</span></li>
+        <li><span><b>DM-i, PHEV</b> deb yozilgan mashinalar gibrid, to'liq elektr emas.</span></li>
+      </ul></div>
+  </div>
+  <div class="redflags">
+    <h3>Perekupni qanday ajratish mumkin</h3>
+    <ul>
+      <li>Profilida 1 tadan ko'p mashina e'loni bor. Bu sayt har bir sotuvchining profilini avtomatik tekshiradi.</li>
+      <li>E'londa kredit, nasiya, vykup, avtosalon, komissiya so'zlari bor.</li>
+      <li>Bir xil fondagi rasmlar, shablon matn, "Срочно!" va ko'p emoji.</li>
+      <li>"Texpasport akamniki" yoki "doverennost bor" deydi.</li>
+      <li>Narx bozordan sezilarli arzon. Bu ko'pincha urilgan mashina yoki odamni chaqirish uchun berilgan e'lon.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- IJARA -->
+<section id="ijara">
+  <div><div class="eyebrow">Ijara narxlari</div><h2>Toshkentda mashina ijarasi qancha turadi</h2>
+  <p class="muted" style="max-width:75ch;margin-top:6px">OLX'dagi 167 ta ijara e'lonidan narxlar olindi. Ularning 69 tasi taksi uchun "suxoy arenda". Ijaraga berishning ikki yo'li bor.</p></div>
+  <div class="formats">
+    <div class="panel"><div class="card-k"><span class="badge">Tavsiya</span><h3>Suxoy arenda (taksiga)</h3></div>
+      <p class="small">Mashina haydovchiga oylab beriladi. U har kuni belgilangan summani to'laydi, yoqilg'ini o'zi quyadi. Mashina oyiga 26–30 kun band bo'ladi, daromad barqaror. Kamchiligi: mashina tez eskiradi.</p></div>
+    <div class="panel"><div class="card-k"><span class="badge warn">Kunlik</span><h3>Rent-a-car (qisqa muddat)</h3></div>
+      <p class="small">Kunlik narx 20–50% qimmatroq, lekin mashina oyiga atigi 10–18 kun band bo'ladi. Zalog, reklama va mijoz izlash kerak. Mashina kam eskiradi.</p></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Model</th><th>Suxoy arenda, kuniga</th><th>Rent-a-car, kuniga</th><th>E'lonlar</th><th>Izoh</th></tr></thead>
+    <tbody>
+      <tr><td class="model">Spark</td><td class="num">140–225 ming</td><td class="num">≈225 ming</td><td class="num">8</td><td class="muted">Eng arzon kirish, kam sarf</td></tr>
+      <tr><td class="model">Nexia 3</td><td class="num">200–220 ming</td><td class="num">—</td><td class="num">2</td><td class="muted">Kam ma'lumot</td></tr>
+      <tr><td class="model">Gentra / Lacetti</td><td class="num">200–290 ming</td><td class="num">300–400 ming</td><td class="num">11</td><td class="muted">Taksida eng ko'p talab</td></tr>
+      <tr><td class="model">Cobalt</td><td class="num">250–300 ming</td><td class="num">≈300 ming</td><td class="num">2</td><td class="muted">Gentra bilan bir xil darajada</td></tr>
+      <tr><td class="model">Onix</td><td class="num">—</td><td class="num">300–375 ming</td><td class="num">2</td><td class="muted"></td></tr>
+      <tr><td class="model">Tracker</td><td class="num">≈500 ming</td><td class="num">—</td><td class="num">1</td><td class="muted">2025 LTZ, yangi mashina</td></tr>
+      <tr><td class="model">Malibu</td><td class="num">—</td><td class="num">450–750 ming</td><td class="num">2</td><td class="muted">Ko'proq qisqa muddatli ijara</td></tr>
+      <tr><td class="model">BYD Seagull / E2 / Chazor</td><td class="num">350–400 ming</td><td class="num">≈675 ming</td><td class="num">5</td><td class="muted">Elektr — haydovchi yoqilg'ida tejaydi</td></tr>
+      <tr><td class="model">BYD Yuan Up</td><td class="num">≈500 ming</td><td class="num">—</td><td class="num">1</td><td class="muted">401 km zapas xod</td></tr>
+      <tr><td class="model">Leapmotor C01</td><td class="num">≈550 ming</td><td class="num">—</td><td class="num">1</td><td class="muted"></td></tr>
+      <tr><td class="model">BYD Song Plus Champion</td><td class="num">≈700 ming</td><td class="num">≈975 ming</td><td class="num">2</td><td class="muted">Premium taksi</td></tr>
+    </tbody></table></div>
+  <p class="note">E'lonlar soni kam bo'lgan modellarda (1–2 ta) narx taxminiy. Narxlar so'mda, e'londagi eng past kunlik narx olindi.</p>
+
+  <div class="grid2">
+    <div class="panel"><h3>Haydovchining 100 km uchun yoqilg'i xarajati, so'm</h3>
+      <p class="small muted">Shuning uchun elektromobil ijarasi qimmatroq: haydovchi yoqilg'ida tejaydi. Hisob: benzin 9 l (AI-92, 12 600 so'm), metan 9 m³ (5 750 so'm), elektr 15 kVt·soat (uy tarifi 900 so'm).</p>
+      <svg class="chart" id="ch-fuel" role="img" aria-label="100 km uchun yoqilg'i xarajati"></svg>
+      <p class="note">Zaryadlash stansiyalarida narx uy tarifidan yuqori va stansiyaga qarab farq qiladi.</p></div>
+    <div class="panel"><h3>Qancha oyda o'zini qoplaydi (suxoy arenda)</h3>
+      <p class="small muted">Mashina narxi bu sahifadagi egasidan e'lonlarning medianasidan olindi. Xarajat va ish kunlari kalkulyatordagi sozlamalarga qarab o'zgaradi.</p>
+      <svg class="chart" id="ch-pay" role="img" aria-label="Qoplanish muddati, oy"></svg></div>
+  </div>
+</section>
+
+<!-- KALKULYATOR -->
+<section id="kalk">
+  <div><div class="eyebrow">Daromad kalkulyatori</div><h2>Ijaraga bersam, qancha topaman?</h2>
+  <p class="muted" style="max-width:75ch;margin-top:6px">Modelni tanlang. Narx va kunlik ijara avtomatik to'ldiriladi. Har bir raqamni o'zingiz o'zgartirishingiz mumkin.</p></div>
+  <div class="panel calc">
+    <div class="fields">
+      <div class="field full"><label for="c-model">Model</label><select id="c-model"></select></div>
+      <div class="field"><label for="c-price">Mashina narxi, $</label><input id="c-price" type="number" min="0" step="100"></div>
+      <div class="field"><label for="c-rate">Kunlik ijara, so'm</label><input id="c-rate" type="number" min="0" step="10000"></div>
+      <div class="field"><label for="c-days">Oyiga ish kunlari</label><input id="c-days" type="number" min="0" max="31" value="26"><span class="hint">Suxoy arenda 26–30, rent-a-car 10–18</span></div>
+      <div class="field"><label for="c-maint">Ta'mir va servis, tushumdan %</label><input id="c-maint" type="number" min="0" max="100" value="10"><span class="hint">Moy, shina, tormoz, mayda ta'mir</span></div>
+      <div class="field"><label for="c-ins">Sug'urta, soliq, GPS — yiliga, so'm</label><input id="c-ins" type="number" min="0" step="100000" value="1800000"></div>
+      <div class="field"><label for="c-dep">Narxining arzonlashuvi, yiliga %</label><input id="c-dep" type="number" min="0" max="100" value="12"><span class="hint">Taksida ishlagan mashina tezroq arzonlashadi</span></div>
+      <div class="field"><label for="c-fx">Dollar kursi, so'm</label><input id="c-fx" type="number" min="1" value="11913"></div>
+    </div>
+    <div class="out">
+      <div class="big"><span>Oylik sof foyda</span><b id="o-net">—</b><small id="o-netusd">—</small></div>
+      <div class="kv">
+        <div><span>Oylik tushum</span><b id="o-gross">—</b></div>
+        <div><span>Oylik xarajat</span><b id="o-cost">—</b></div>
+        <div><span>Yillik sof foyda</span><b id="o-year">—</b></div>
+        <div><span>Qoplanish muddati</span><b id="o-pay">—</b></div>
+        <div><span>Yillik daromadlilik (arzonlashuv hisobga olingan)</span><b id="o-roi">—</b></div>
+        <div><span>Mashina narxi, so'm</span><b id="o-cap">—</b></div>
+      </div>
+      <p class="note">Hisob: tushum = kunlik ijara × ish kunlari. Xarajat = ta'mir foizi + sug'urta/12. Daromadlilik = (yillik sof foyda − yillik arzonlashuv) ÷ mashina narxi. Haydovchi to'lamay qolishi yoki avariya xavfi kiritilmagan. Haydovchi bilan yozma shartnoma tuzing va zalog oling.</p>
+    </div>
+  </div>
+</section>
+
+<!-- E'LONLAR -->
+<section id="elon">
+  <div><div class="eyebrow">E'lonlar</div><h2 id="elon-h">Egasi sotayotgan 81 ta mashina</h2>
+  <p class="muted" style="margin-top:6px">Ustun sarlavhasini bossangiz saralanadi. "Tekshiring" belgisi filtrdan o'tgan, lekin baribir shubhali e'lonlarga qo'yilgan.</p></div>
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Turi"><button id="t-chev" aria-pressed="true">Chevrolet (35)</button><button id="t-ev" aria-pressed="false">Elektromobil (46)</button></div>
+    <input type="search" id="q" placeholder="Qidirish: model, shahar, rang…" aria-label="Qidirish">
+    <label class="chk"><input type="checkbox" id="clean"> Faqat belgisizlar</label>
+  </div>
+  <div class="note" id="count"></div>
+  <div class="tbl"><table class="wide">
+    <thead><tr>
+      <th data-k="1">Model</th><th data-k="2">Yili</th><th data-k="3">Probeg, km</th><th data-k="4">Rangi</th>
+      <th data-k="5">Holati</th><th data-k="6">Egalar</th><th data-k="7">Narxi</th><th data-k="8">Shahar</th>
+      <th data-k="9">Sotuvchi</th><th>Kamchiligi / izoh</th><th>E'lon</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+  <p class="note">Kamchilik ustunida sotuvchi o'zi yozgan narsa bor. Chiziqcha (—) "kamchilik yo'q" degani emas, sotuvchi bu haqda hech narsa yozmagan degani.</p>
+</section>
+
+</div></main>
+
+<footer><div class="in">
+  <b>Manbalar</b>
+  <ul>
+    <li>E'lonlar: OLX.uz, har soatda avtomatik yangilanadi (oxirgi 100 ta Chevrolet va 100 ta elektromobil e'loni tekshiriladi)</li>
+    <li>Ijara narxlari: OLX.uz, 14-oktabr 2026 holatiga ko'ra</li>
+    <li>Dollar kursi: O'zbekiston Respublikasi Markaziy banki (cbu.uz), 14.10.2026</li>
+    <li>Benzin AI-92: avtoelon.uz, 22.09.2026 holatiga Toshkent bo'yicha o'rtacha narx</li>
+    <li>Metan 5 700–5 800 so'm/m³: spot.uz, 01.06.2026</li>
+    <li>Elektr energiyasi tariflari 01.06.2026 dan: kun.uz</li>
+  </ul>
+  <span>Bu sahifa moliyaviy maslahat emas. Raqamlar taxminiy, qaror qabul qilishdan oldin o'zingiz tekshiring.</span>
+</div></footer>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+let CHEV=[
+["ID4uuh7","Malibu 1 (3-pozitsiya)",2012,208000,"Oq","A'lo",2,"$12 000","Toshkent, Uchtepa","abduhakimabduganiyevich85","«Ishi yo'q» deb yozilgan",""],
+["ID4uyIH","Cobalt (avtomat)",2022,112700,"Oq","A'lo",1,"$9 500","Toshkent, Mirobod","Muxriddin","Kraska toza; orqa bamper almashgan, old bamperda ham ishi bor",""],
+["ID4gHpq","Nexia 2",2009,3000,"Kumush","A'lo",1,"50 mln so'm","Vobkent","998939734515","«Hech qanday ishi yo'q» deyilgan","Probeg real emas"],
+["ID44Z73","Nexia",2010,490,"Oq","Yaxshi",2,"53 mln so'm","Shahrisabz","Sardor","Kapot, krilo va eshikda kraska bor, kuzov butun","Probeg real emas"],
+["ID4uGG7","Matiz",2016,130,"Oq","Yaxshi",1,"$3 350","Toshkent","Ibra","—","Probeg real emas"],
+["ID3rShJ","Chevrolet (model ko'rsatilmagan)",2009,290000,"Oq","A'lo",2,"108 mln so'm","Toshkent","998337330067","—",""],
+["ID3u0sk","Gentra (avtomat)",2022,14500,"Qora","A'lo",1,"$16 200","Toshkent","javohir33","Toza deyilgan",""],
+["ID4uCLb","Tracker Premier Plus",2024,26800,"Qora","A'lo",1,"$15 000","Toshkent","BEK","Kraska toza",""],
+["ID4uyys","Captiva",2015,205000,"Bronza","A'lo",2,"$9 500","G'azalkent","998949303313","—",""],
+["ID4uDGT","Cobalt",2023,39000,"Ko'k","A'lo",1,"$9 800","Toshkent","disturbed96","—",""],
+["ID4gHoB","Nexia",2017,355,"Oq","Yaxshi",1,"$6 400","Qo'qon","Nodirbek","—","Probeg real emas"],
+["ID4uGFG","Tracker 2 Premier",2023,95000,"Qora","Yaxshi",2,"$12 900","Toshkent","Admin","Old krilo va kapotda kraska bor; propan gaz","Profil nomi «Admin»"],
+["ID4uGFD","Damas",2021,62000,"Oq","A'lo",1,"$4 600","Romitan","tolmasakramov044","Kraskasi bor; propan gaz",""],
+["ID3WSZH","Gentra",2015,153000,"Asfalt","Yaxshi",1,"$6 200","Toshkent","Ясин Ибрагимов","—",""],
+["ID4uGFb","Nexia 3 (avtomat)",2019,183000,"Asfalt","Yaxshi",3,"$7 500","Samarqand","Azimjon Hamidov","25% kraska bor",""],
+["ID4uGF4","Malibu 2",2018,215000,"Oq","Yaxshi",1,"$14 800","Toshkent","Rasu","Oldi sepilgan, parogida ishi bor","Profil bugun ochilgan"],
+["ID4oevD","Gentra",2020,163621,"Asfalt","A'lo",1,"$9 500","Toshkent","AICRANE","—","Profil nomi kompaniyaga o'xshaydi"],
+["ID3UOV5","Damas",2024,750,"Oq","A'lo","—","$7 699","Samarqand","998940303070","—",""],
+["ID4uGBE","Spark",2017,325000,"Oq","Yaxshi",1,"$5 000","Eshonguzar","islamusmanovich0100","—",""],
+["ID4uFiM","Malibu",2019,106000,"Oq","A'lo",1,"$17 500","Toshkent","azamova172737","—",""],
+["ID4oQmf","Gentra (avtomat)",2021,70000,"Qora","A'lo",1,"$9 500","Keles","Самандар","Urilgan: orqa eshik va kapot almashgan",""],
+["ID3U1cU","Matiz",2009,25000,"Oq","A'lo",2,"$3 200","Buxoro","Diyorbek","Sariqdan oqqa qayta bo'yalgan; urilgan joyi yo'q deyilgan",""],
+["ID3S7Uf","Cobalt",2023,13000,"Ko'k","A'lo",1,"159 mln so'm","Quyganyor","dshahnozaxon","Kraska toza",""],
+["ID3WMwp","Matiz (avtomat)",2008,340,"Yashil","Yaxshi",2,"$4 200","Farg'ona","jamoldin0619","Kraska toza","Probeg real emas"],
+["ID3QeWA","Captiva",2013,140000,"Qora","A'lo",2,"$13 500","Denov","Уктам","Kraska yo'q (toza)",""],
+["ID4uGDG","Gentra",2023,36000,"Qora","Yaxshi",1,"$12 700","Toshkent","Sherzod Ergashev","Orqa o'ng krilda kraska bor",""],
+["ID4lQZq","Damas",2025,31000,"Oq","A'lo",1,"$7 800","Samarqand","amonqulovshaxzod856","—",""],
+["ID4uxY6","Spark",2015,380000,"Yashil","Yaxshi","—","$7 015","Toshkent","aziza","—",""],
+["ID4uyfU","Gentra",2021,72000,"Oq","A'lo",2,"$10 600","Toshkent","998900030111","Full kraska toza",""],
+["ID3GVdz","Epica",2008,1,"Qora","A'lo",2,"$9 700","Navoiy","998995577737","Kraska toza, xarajati yo'q deyilgan","Probeg real emas"],
+["ID4bNUo","Cobalt",2022,113000,"Oq","A'lo",1,"$11 600","Yangiqishloq","998997489200","—",""],
+["ID4nomG","Gentra",2014,220000,"Havorang","Yaxshi",2,"$6 600","Samarqand","akosha19960307","—",""],
+["ID4uzff","Gentra",2020,76000,"Oq","A'lo","—","$10 000","Toshkent","sssss","Kraska 100% zavodniki; metan gaz",""],
+["ID4uAgT","Gentra",2014,320,"Oq","A'lo",2,"$6 500","Toshkent, Mirobod","Abdulaziz","O'ng krilda kraska; texnik ishi yo'q","Probeg real emas"],
+["ID3OksR","Matiz",2010,230000,"Oq","Yaxshi",2,"45 mln so'm","Buxoro","dostonbekjuraev05","—",""]
+];
+let EV=[
+["ID4upSP","GAC Aion Hycan A06",2024,0,"Oq","Yaxshi",1,"$19 400","Toshkent","zsardorn220292","—",""],
+["ID4qo2X","Hoan N2",2019,12000,"Oq","Yaxshi",2,"$5 000","Toshkent","Usmon Sulton","DTP yo'q deyilgan",""],
+["ID4rY34","MG Marvel R",2021,118000,"Bej","A'lo",1,"$16 900","Toshkent","936902121","Kraskada dog' bor; zapas xod 505 km",""],
+["ID4opTY","Nissan Leaf",2014,86400,"Ko'k","A'lo",1,"100 mln so'm","Qorovul","pulat saburov","Kraska toza",""],
+["ID3X7oO","Xawtay 230",2017,37000,"Kumush","A'lo",2,"$8 500","Ko'ksaroy","Epson","Kapotda kraska dog'i bor",""],
+["ID4u6Ew","Honda e:NP1",2023,35000,"Oq","A'lo",1,"$20 000","Andijon","Азизбек","Kraska toza; zapas xod 510 km",""],
+["ID3Rypb","Karry K",2018,130000,"Oq","Yaxshi",1,"$9 000","Toshkent","Хамза","2 joyda kraska; zapas xod 200 km",""],
+["ID4qFZp","Geely Farizon SEA2",2023,47000,"Oq","A'lo",1,"$15 700","Farg'ona","998979750035","—",""],
+["ID3PIrc","Geely (elektr)",2022,17300,"Oq","A'lo",1,"$16 900","Toshkent","998990305345","Kraska toza",""],
+["ID49gmG","Wuling (elektr)",2023,21000,"Oq","A'lo",1,"$14 000","Jizzax","tuychieverkin0","—",""],
+["ID4ukeQ","Changan (elektr)",2021,102000,"Oq","A'lo",2,"$16 150","Toshkent","sagatovdilshod797","Kraska toza, DTPda bo'lmagan",""],
+["ID4ayGG","Changan Ben Ben E-Star",2023,47000,"Oq","A'lo",1,"$10 000","G'azalkent","Jasurbek","Kamchiligi yo'q deyilgan",""],
+["ID4tw0f","Volkswagen ID.6 Crozz Pro",2022,125000,"Oq","A'lo","—","$23 000","Quyganyor","Авазбек","Kraskasi toza",""],
+["ID3nbOi","Chevrolet Spark EV",2016,77770,"Kulrang","A'lo",1,"$12 500","Buxoro","Рахматилло","Kamchiligi yo'q deyilgan",""],
+["ID4ohlO","Chery (elektr)",2024,null,"Qora","A'lo",1,"328 mln so'm","Toshkent","Azim","—","Kompaniyaga tegishli deyilgan"],
+["ID2Vx2L","Chevrolet Labo EV",2019,2000,"Oq","A'lo","—","$15 600","Samarqand","ulugbek","—",""],
+["ID3Nbpv","Honda X-NV",2020,79500,"Oq","Yaxshi",1,"$14 850","Toshkent","Zokir","—",""],
+["ID3h692","BAIC (Beijing) EV",2019,20000,"Qora","A'lo",1,"$27 000","Samarqand","xusansuyunov10","—",""],
+["ID3HAQs","Chevrolet Menlo",2023,500,"Oq","A'lo",1,"$20 500","Nazarbek","Aziz","—",""],
+["ID444Nq","BYD Song Plus EV Champion",2024,10000,"Qora","A'lo",1,"$28 200","Toshkent","Исмаилходжаева Ш.","—",""],
+["ID4c1AR","Neta GT",2023,17777,"Qora","A'lo",1,"$27 700","Toshkent","rabbimov.davronbek","—",""],
+["ID4tGeK","Chery iCAR 03",2024,60000,"Qora","A'lo",1,"$26 500","Toshkent","Бешбармак","—","Profil nomi biznesga o'xshaydi"],
+["ID4umud","BYD Song Plus EV Champion 605",2024,45000,"Qora","A'lo",1,"$27 500","Toshkent","998900363333","Kraska toza; xodovoy qilingan",""],
+["ID4ujbt","iCAR eQ7",2025,7000,"Qora","A'lo",1,"$24 000","Toshkent","Nazm","—",""],
+["ID4hE13","Chery iCAR 03 Long Range 4WD",2024,45000,"Qora","A'lo",1,"$26 000","Toshkent","Лола","—",""],
+["ID3K5DH","EV-easy (3-pozitsiya)",2022,1000,"Qora","A'lo",1,"$23 000","Farg'ona","Ирина","Yangi deyilgan",""],
+["ID4ugt4","BYD Song Plus Champion Edition",2025,27000,"Asfalt","A'lo",2,"$31 700","Toshkent","кондиционер установка","—","Profil nomi biznesga o'xshaydi"],
+["ID3TXCx","Eveasy",2024,140,"Oq","A'lo",1,"$25 000","Namangan","998902220607","—",""],
+["ID488yi","Honda (elektr, sport)",2021,74000,"Bej","A'lo",1,"$19 500","Keles","998977147450","Kraska toza, birinchi qo'l",""],
+["ID3ukhl","BAIC BJEV EX5",2019,58000,"Oq","Yaxshi",1,"$23 000","Qibray","Олжас","—",""],
+["ID3ZPEp","Weltmeister",2021,82000,"Oq","A'lo",1,"$15 500","Toshkent","Умид","Toza deyilgan",""],
+["ID40UP9","Mercedes (e'londa E 400)",2020,null,"Qora","A'lo",1,"$45 000","Toshkent","Умид Ботырович","—",""],
+["ID3TbFc","Hyundai Ioniq EV",2018,195000,"Oq","A'lo",1,"$12 600","Toshkent","Mister X","Koreyadan keltirilgan",""],
+["ID48ULB","Elektromobil (model yozilmagan)",2025,0,"Oq","A'lo",1,"$26 000","Chirchiq","Хусан","Yangi, ko'chish sababli sotiladi",""],
+["ID3XIRH","Dongfeng E70",2023,800,"Oq","A'lo",1,"200 mln so'm","Kogon","ramazonovdavron6","—",""],
+["ID4heeS","Wuling (yangi)",2025,2200,"Bej","A'lo",1,"$22 000","Toshkent","998335550188","—",""],
+["ID4uncQ","BYD Yuan Up",2026,5000,"Kulrang","A'lo",1,"$22 200","Toshkent","Nurzod","—",""],
+["ID4uGHM","BYD Song Plus Champion",2023,51000,"Qora","Yaxshi",1,"$27 000","Toshkent","Акмалбек","—",""],
+["ID4uGDR","BYD E2",2023,153000,"Oq","Yaxshi",1,"$12 800","Toshkent","Хозяин","—",""],
+["ID4uGxx","BYD Yuan Plus",2022,80000,"Ko'k","A'lo",1,"$20 500","Toshkent","rziyodullayev562","Kraska toza, bir qo'l haydalgan",""],
+["ID4uDH3","BYD Han",2026,0,"Qora","A'lo",1,"$39 000","Toshkent","Johongir","—",""],
+["ID4uGwL","BYD Song Pro DM-i Champion",2023,70000,"Qora","Yaxshi",1,"$23 800","Buxoro","Aslonovjasur75","—","DM-i aslida gibrid"],
+["ID4uEFx","BYD Song Plus EV Champion",2024,31500,"Qora","A'lo",1,"$28 300","Toshkent","Murodjon","—",""],
+["ID4uzRS","BYD Song Plus EV Champion (restyle)",2024,33400,"Qora","A'lo",1,"$26 000","Shahrixon","Olimjon","—",""],
+["ID4rNGu","BYD Sealion 07",2025,20000,"Ko'k","A'lo",1,"$34 000","Toshkent","Абдулла","—",""],
+["ID4uG4p","BYD Yuan Up",2025,24500,"Qora","A'lo",1,"$22 000","Eshonguzar","murodillash","Toza saqlangan",""]
+];
+
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString("ru-RU");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const FX0=11913;
+const usd=p=>{const n=parseFloat(String(p).replace(/[^\d.]/g,''));return String(p).includes("so'm")?n*1e6/FX0:n};
+const median=a=>{const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+const groupChev=m=>{const k=["Malibu","Cobalt","Nexia","Matiz","Gentra","Tracker","Captiva","Damas","Spark","Epica"].find(x=>m.includes(x));return k||"Boshqa"};
+const groupEv=m=>{if(/BYD Song/.test(m))return "BYD Song";if(/BYD/.test(m))return "BYD (boshqa)";if(/iCAR|Chery/.test(m))return "Chery / iCAR";if(/Chevrolet/.test(m))return "Chevrolet EV";if(/Honda/.test(m))return "Honda";if(/Geely/.test(m))return "Geely";if(/Changan/.test(m))return "Changan";if(/BAIC/.test(m))return "BAIC";if(/Wuling/.test(m))return "Wuling";return "Boshqa"};
+
+/* tooltip */
+const tip=$("tip");
+function bindTip(el,text){el.addEventListener("mousemove",e=>{tip.textContent=text;tip.hidden=false;const x=Math.min(e.clientX+14,innerWidth-tip.offsetWidth-8);tip.style.left=x+"px";tip.style.top=(e.clientY+14)+"px"});el.addEventListener("mouseleave",()=>tip.hidden=true)}
+
+/* horizontal bar chart */
+function hbar(svg,items,{valFmt=v=>fmt(v),tipFmt}={}){
+  const W=Math.max(300,svg.clientWidth||520),L=Math.min(150,W*0.36),R=64,rowH=28,T=6;
+  const H=T+items.length*rowH+18,max=Math.max(...items.map(d=>d.v))*1.02||1,pw=W-L-R;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.setAttribute("height",H);
+  const ticks=4;let g="";
+  for(let i=0;i<=ticks;i++){const x=L+pw*i/ticks;g+=`<line class="grid" x1="${x}" x2="${x}" y1="${T}" y2="${H-18}"/><text x="${x}" y="${H-4}" text-anchor="middle">${valFmt(max*i/ticks)}</text>`}
+  items.forEach((d,i)=>{const y=T+i*rowH,w=Math.max(2,pw*d.v/max);
+    g+=`<g class="row" data-i="${i}"><rect x="0" y="${y}" width="${W}" height="${rowH}" fill="transparent"/><text class="lbl" x="${L-8}" y="${y+rowH/2+4}" text-anchor="end">${esc(d.label)}</text><rect class="bar${d.dim?' dim':''}" x="${L}" y="${y+6}" width="${w}" height="${rowH-12}" rx="3"/><text class="val" x="${L+w+6}" y="${y+rowH/2+4}">${valFmt(d.v)}</text></g>`});
+  svg.innerHTML=g;
+  svg.querySelectorAll("g.row").forEach(el=>{const d=items[+el.dataset.i];bindTip(el,tipFmt?tipFmt(d):d.label+": "+valFmt(d.v))});
+}
+const kfmt=v=>v>=1e6?(v/1e6).toFixed(1).replace(".0","")+" mln":v>=1000?Math.round(v/1000)+" ming":fmt(v);
+const dfmt=v=>"$"+(v>=1000?(v/1000).toFixed(v>=10000?0:1).replace(".0","")+"k":fmt(v));
+
+/* STATISTIKA */
+let statEv=false;
+function stats(){
+  const src=statEv?EV:CHEV,grp=statEv?groupEv:groupChev,G={};
+  src.forEach(r=>{const k=grp(r[1]);(G[k]=G[k]||[]).push(r)});
+  const rows=Object.entries(G).map(([k,a])=>{const p=a.map(r=>usd(r[7])),km=a.filter(r=>r[3]!=null&&!(r[3]<1000&&r[2]<2024)).map(r=>r[3]);
+    return {label:`${k} (${a.length})`,name:k,n:a.length,v:median(p),min:Math.min(...p),max:Math.max(...p),yr:a.reduce((s,r)=>s+r[2],0)/a.length,km:km.length?km.reduce((s,x)=>s+x,0)/km.length:null}}).sort((a,b)=>b.v-a.v);
+  hbar($("ch-price"),rows,{valFmt:dfmt,tipFmt:d=>`${d.name}: mediana $${fmt(d.v)}, oraliq $${fmt(d.min)}–$${fmt(d.max)}, ${d.n} ta e'lon`});
+  $("stat-tb").innerHTML=rows.map(d=>`<tr><td class="model">${esc(d.name)}</td><td class="num">${d.n}</td><td class="num">$${fmt(d.min)}${d.n>1?"–$"+fmt(d.max):""}</td><td class="num">${Math.round(d.yr)}</td><td class="num">${d.km==null?"—":fmt(d.km)}</td></tr>`).join("");
+  $("s-chev").setAttribute("aria-pressed",!statEv);$("s-ev").setAttribute("aria-pressed",statEv);
+}
+$("s-chev").onclick=()=>{statEv=false;stats()};$("s-ev").onclick=()=>{statEv=true;stats()};
+
+/* FUEL */
+function fuel(){hbar($("ch-fuel"),[
+  {label:"Benzin AI-92",v:9*12600},{label:"Metan",v:9*5750},{label:"Elektr (uyda)",v:15*900}
+],{valFmt:kfmt,tipFmt:d=>d.label+": 100 km uchun ≈"+fmt(d.v)+" so'm"})}
+
+/* RENTAL MODELS: price = median of owner listings where we have them */
+const pick=(arr,re)=>arr.filter(r=>re.test(r[1])).map(r=>usd(r[7]));
+let RM=[];
+const buildRM=()=>[
+  {n:"Spark",p:median(pick(CHEV,/Spark/)),r:180000,src:"8 ta e'lon"},
+  {n:"Nexia",p:median(pick(CHEV,/Nexia/)),r:200000,src:"2 ta e'lon"},
+  {n:"Damas",p:median(pick(CHEV,/Damas/)),r:150000,src:"1 ta e'lon"},
+  {n:"Gentra / Lacetti",p:median(pick(CHEV,/Gentra/)),r:260000,src:"11 ta e'lon"},
+  {n:"Cobalt",p:median(pick(CHEV,/Cobalt/)),r:270000,src:"2 ta e'lon"},
+  {n:"Tracker",p:median(pick(CHEV,/Tracker/)),r:450000,src:"1 ta e'lon"},
+  {n:"Malibu (rent-a-car)",p:median(pick(CHEV,/Malibu/)),r:500000,src:"2 ta e'lon",days:15},
+  {n:"BYD E2",p:median(pick(EV,/BYD E2/)),r:400000,src:"1 ta e'lon"},
+  {n:"BYD Yuan Up",p:median(pick(EV,/Yuan Up/)),r:500000,src:"1 ta e'lon"},
+  {n:"BYD Song Plus Champion",p:median(pick(EV,/Song Plus/)),r:700000,src:"2 ta e'lon"}
+].filter(m=>isFinite(m.p)&&m.p>0);
+RM=buildRM();
+const FALLBACK_P={"Spark":6000,"Nexia":6400,"Damas":7700,"Gentra / Lacetti":9500,"Cobalt":10700,"Tracker":13950,"Malibu (rent-a-car)":14800,"BYD E2":12800,"BYD Yuan Up":22100,"BYD Song Plus Champion":27850};
+
+/* CALCULATOR */
+const C=["price","rate","days","maint","ins","dep","fx"].reduce((o,k)=>(o[k]=$("c-"+k),o),{});
+function fillModels(){const keep=$("c-model").value;
+$("c-model").innerHTML=RM.map((m,i)=>`<option value="${i}">${esc(m.n)} — ${kfmt(m.r)}/kun</option>`).join("")+`<option value="-1">O'zim kiritaman</option>`;
+if(keep!==""&&[...$("c-model").options].some(o=>o.value===keep))$("c-model").value=keep;}
+fillModels();
+function loadModel(){const i=+$("c-model").value;if(i<0)return;const m=RM[i];C.price.value=Math.round(m.p/100)*100;C.rate.value=m.r;C.days.value=m.days||26;calc()}
+function econ(price,rate,days,maint,ins,dep,fx){const gross=rate*days,cost=gross*maint/100+ins/12,net=gross-cost,cap=price*fx;
+  return {gross,cost,net,cap,pay:net>0?cap/net:Infinity,roi:cap>0?((net*12)-cap*dep/100)/cap*100:0}}
+function calc(){
+  const v=k=>Math.max(0,parseFloat(C[k].value)||0);
+  const e=econ(v("price"),v("rate"),v("days"),v("maint"),v("ins"),v("dep"),v("fx")||FX0);
+  $("o-net").textContent=fmt(e.net)+" so'm";$("o-net").classList.toggle("neg",e.net<0);
+  $("o-netusd").textContent="≈ $"+fmt(e.net/(v("fx")||FX0))+" oyiga";
+  $("o-gross").textContent=fmt(e.gross);$("o-cost").textContent=fmt(e.cost);
+  $("o-year").textContent=fmt(e.net*12);$("o-cap").textContent=fmt(e.cap);
+  $("o-pay").textContent=isFinite(e.pay)?e.pay.toFixed(1)+" oy":"qoplamaydi";
+  $("o-roi").textContent=e.roi.toFixed(1)+" %";$("o-roi").classList.toggle("neg",e.roi<0);
+  payback();
+}
+function payback(){
+  const v=k=>Math.max(0,parseFloat(C[k].value)||0),fx=v("fx")||FX0;
+  const items=RM.map(m=>{const e=econ(m.p,m.r,m.days||v("days"),v("maint"),v("ins"),v("dep"),fx);return {label:m.n,v:isFinite(e.pay)?e.pay:0,m,e,dim:/1 ta/.test(m.src)}}).sort((a,b)=>a.v-b.v);
+  hbar($("ch-pay"),items,{valFmt:v=>v.toFixed(0)+" oy",tipFmt:d=>`${d.m.n}: narx ≈$${fmt(d.m.p)}, ijara ${kfmt(d.m.r)}/kun, sof ≈$${fmt(d.e.net/fx)}/oy, ${d.v.toFixed(1)} oyda qoplanadi (${d.m.src})`});
+}
+$("c-model").onchange=loadModel;
+Object.values(C).forEach(i=>i.addEventListener("input",()=>{if(i!==C.days&&i!==C.maint&&i!==C.ins&&i!==C.dep&&i!==C.fx)$("c-model").value="-1";calc()}));
+$("c-model").value="3";loadModel();
+
+/* LISTINGS */
+let cur=CHEV,sortK=null,asc=true;
+function render(){
+  const q=$("q").value.trim().toLowerCase(),clean=$("clean").checked;
+  let r=cur.filter(x=>(!q||x.join(" ").toLowerCase().includes(q))&&(!clean||!x[11]));
+  if(sortK!==null){r=[...r].sort((a,b)=>{let A=a[sortK],B=b[sortK];if(sortK==7){A=usd(A);B=usd(B)}
+    if(A==null||A==="—")return 1;if(B==null||B==="—")return -1;return (A>B?1:A<B?-1:0)*(asc?1:-1)})}
+  $("rows").innerHTML=r.map(x=>`<tr><td class="model">${esc(x[1])}${x[12]?` <span class="chip new">Yangi</span>`:""}${x[11]?`<br><span class="chip">Tekshiring: ${esc(x[11])}</span>`:""}</td>
+    <td class="num">${x[2]}</td><td class="num">${x[3]==null?"—":x[3].toLocaleString("ru-RU")}</td><td>${esc(x[4])}</td><td>${esc(x[5])}</td>
+    <td class="num">${x[6]}</td><td class="num">${esc(x[7])}</td><td>${esc(x[8])}</td><td>${esc(x[9])}</td>
+    <td class="def">${esc(x[10])}</td><td><a href="https://www.olx.uz/d/obyavlenie/e-${x[0]}.html" target="_blank" rel="noopener">Ochish</a></td></tr>`).join("");
+  $("count").textContent=r.length+" ta e'lon ko'rsatilmoqda";
+}
+function setTab(ev){cur=ev?EV:CHEV;$("t-chev").setAttribute("aria-pressed",!ev);$("t-ev").setAttribute("aria-pressed",ev);render()}
+$("t-chev").onclick=()=>setTab(false);$("t-ev").onclick=()=>setTab(true);
+$("q").oninput=render;$("clean").onchange=render;
+document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=+th.dataset.k;asc=sortK===k?!asc:true;sortK=k;render()});
+
+function drawAll(){stats();fuel();payback()}
+drawAll();render();
+
+/* LIVE DATA: /api/cars har soatda yangilanadi */
+function counts(rm){
+  const own=CHEV.length+EV.length;
+  $("k-own").textContent=own;
+  $("k-own-l").textContent=`egasidan e'lon (${CHEV.length} Chevrolet, ${EV.length} elektro)`;
+  if(rm!=null)$("k-rm").textContent=rm;
+  $("elon-h").textContent=`Egasi sotayotgan ${own} ta mashina`;
+  $("t-chev").textContent=`Chevrolet (${CHEV.length})`;$("t-ev").textContent=`Elektromobil (${EV.length})`;
+}
+async function loadLive(){
+  try{
+    const r=await fetch("/api/cars",{cache:"no-store"});
+    if(!r.ok)throw new Error(r.status);
+    const j=await r.json();
+    if(!j.chev||!j.ev||(j.chev.length+j.ev.length)===0)throw new Error("bo'sh");
+    CHEV=j.chev;EV=j.ev;
+    cur=$("t-ev").getAttribute("aria-pressed")==="true"?EV:CHEV;
+    RM=buildRM();
+    const have=new Set(RM.map(m=>m.n));
+    // e'lon topilmagan modellar uchun avvalgi narxni saqlaymiz
+    Object.entries(FALLBACK_P).forEach(([n,p])=>{if(!have.has(n)){const t=[
+      ["Spark",180000],["Nexia",200000],["Damas",150000],["Gentra / Lacetti",260000],["Cobalt",270000],["Tracker",450000],["Malibu (rent-a-car)",500000],["BYD E2",400000],["BYD Yuan Up",500000],["BYD Song Plus Champion",700000]].find(x=>x[0]===n);
+      RM.push({n,p,r:t[1],src:"oldingi ma'lumot",days:n.includes("Malibu")?15:undefined})}});
+    fillModels();
+    const rmv=j.removed?(j.removed.perekup+j.removed.words+j.removed.business):null;
+    counts(rmv);drawAll();render();calc();
+    const t=new Date(j.updated);
+    const hh=t.toLocaleTimeString("uz-UZ",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Tashkent"});
+    const dd=t.toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit",timeZone:"Asia/Tashkent"});
+    $("live").textContent=`OLX.uz · jonli · yangilandi ${dd} ${hh} (Toshkent) · keyingisi 1 soatdan keyin`;
+    $("live-dot").className="dot ok";
+  }catch(e){
+    $("live").textContent="OLX.uz · hozir ulanib bo'lmadi, 14-oktabr holatidagi ma'lumot ko'rsatilmoqda";
+    $("live-dot").className="dot err";
+  }
+}
+loadLive();
+setInterval(loadLive,60*60*1000);
+let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(drawAll,150)});
+</script>
+
+</body>
+</html>
