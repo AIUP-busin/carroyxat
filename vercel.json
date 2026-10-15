@@ -1,4 +1,11 @@
 {
-  "regions": ["fra1"],
-  "functions": { "api/cars.js": { "maxDuration": 60 } }
+  "regions": [
+    "fra1"
+  ],
+  "functions": {
+    "api/cars.js": {
+      "maxDuration": 60
+    }
+  },
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ':(exclude)data'"
 }
